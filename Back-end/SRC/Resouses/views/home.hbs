@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;700&amp;display=swap">
+  <title>Golden Sneaker</title>
+  <!-- <link href="styles.css" rel="preload" as="style"> -->
+  <link href="/css/app.css" rel="stylesheet">
+</head>
+
+<body>
+  <div class="cartMainContent">
+    <div class="cartCard">
+      <div class="cartCardTop">
+        <img src="/img/nike.png" class="CardTopLogo">
+      </div>
+      <div class="CartTitle">
+        Our Products
+      </div>
+      <div class="cartCardBody">
+        <div>
+          {{#each products}}
+
+          <div class="ShopItem">
+            <p style="display: none;" class="idProduct">{{this.id}}</p>
+            <div class="ShopItemImage" style="background-color:{{this.color}}">
+              <img src="{{this.image}}" alt="">
+            </div>
+            <div class="ShopItemName">
+              {{this.name}}
+            </div>
+            <div class="ShopItemDescription">
+              {{this.description}}
+            </div>
+            <div class="ShopItemBot">
+              <div class="cartShopItemPrice">
+
+              </div>
+              <div class="ShopItemAddToCart">
+                <p>ADD TO CART</p>
+                <img src="/img/check.png" alt="" style="transform: scale(0.3); display: none;">
+              </div>
+            </div>
+          </div>
+          {{/each}}
+        </div>
+      </div>
+
+    </div>
+    <div class="cartCard">
+      <div class="cartCardTop">
+        <img src="/img/nike.png" class="CardTopLogo">
+      </div>
+      <div class="CartTitle">
+        Your cart
+        <span class="Amount">$0.00</span>
+      </div>
+      <div class="cartCardBody">
+        <div class="emptyNotify" style="display: none;">
+          <p class="emptyNotifyDes">Your cart is empty.</p>
+        </div>
+        <div>
+          <div id="cartItemsContainer">
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"
+    integrity="sha512-b94Z6431JyXY14iSXwgzeZurHHRNkLt9d6bAHt7BZT38eqV+GyngIi/tVye4jBKPYQ2lBdRs0glww4fmpuLRwA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script>
+    //lấy hết sản phẩm được khách hàng chọn trước đó lên   
+    axios.get(`{{local}}/api/v1/products`)
+      .then(response => {
+        var result = response.data.shoeCart;
+        for (var i = 0; i < result.length; i++) {
+          var idItem = document.querySelectorAll(".idProduct");
+          for (var j = 0; j < idItem.length; j++) {
+            if (idItem[j].textContent == result[i].id) {
+              var addToCart = document.querySelectorAll(".ShopItemAddToCart");
+              var index = j;
+              addToCart[index].classList.add("NotActive");
+              addToCart[index].querySelector("p").style.display = 'none';
+              addToCart[index].querySelector("img").style.display = 'block';
+              break;
+            }
+          }
+          // Tạo một phần tử div mới
+          var newItem = document.createElement('div');
+          newItem.style.display = 'none';
+          newItem.innerHTML = `
+    <div class="cartItem">
+         <p style="display: none;" class="idProduct2">${result[i].id}</p>
+                                    <div class="cartItemLeft cartItemLeft">
+                                        <div class="cartItemImage cartItemImage" style="background-color:${result[i].color}">
+                                            <div class="cartItemImageBack">
+                                                <img src="${result[i].image}" alt="">
+                                            </div>
+                                        </div>
+                                       
+                                    </div>
+                                    <div class="cartItemRight cartItemRight">
+                                        <div class="cartItemName cartItemName">
+                                            ${result[i].name}
+                                        </div>
+                                        <div class="cartItemPrice cartItemPrice">
+                                            ${result[i].price}
+                                        </div>
+                                        <div class="cartItemAnimate cartItemActions">
+                                            <div class="cartItemCount cartItemCount">
+                                                <div class="cartItemCountButton minus">-</div>
+                                                <div class="cartItemCountNumber number">${response.data.cartItems[i].number}</div>
+                                                <div class="cartItemCountButton plus">+</div>
+                                            </div>
+                                            <div class="cartItemRemove cartItemRemove">
+                                                <img src="/img/trash.png" alt="">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+  `;
+
+          var cartItemsContainer = document.getElementById('cartItemsContainer');
+
+          // Thêm phần tử mới vào cuối danh sách
+          cartItemsContainer.appendChild(newItem);
+          var Price2 = document.querySelectorAll(".cartItemPrice");
+          var priceFormat = '$';
+          priceFormat += parseFloat(Price2[Price2.length - 1].textContent).toFixed(2);
+
+          Price2[Price2.length - 1].innerHTML = priceFormat;
+          // Hiển thị phần tử mới
+          newItem.style.display = 'block';
+
+          var data = { id: result, number: response.data.cartItems[i].number };
+          Plus();
+          Minus();
+          remove();
+        }
+
+        getSum();
+      });
+    //tính tổng tiền
+    function getSum() {
+      var Sum = document.querySelector(".Amount").textContent;
+      Sum = '$0.00';
+      Sum = Sum.slice(1);
+      var num = document.querySelectorAll(".number");
+      var price = document.querySelectorAll(".cartItemPrice");
+      for (var i = 0; i < num.length; i++) {
+        Sum = parseFloat(price[i].textContent.slice(1)) * parseInt(num[i].textContent) + (parseFloat(Sum));
+      }
+  
+      if (Sum !== '0.00')
+        Sum = Sum.toFixed(2);
+      else {
+        document.querySelector(".emptyNotify").style.display = 'block';
+      }
+      Sum = '$' + Sum;
+      document.querySelector(".Amount").textContent = Sum;
+    }
+
+    //thêm sự kiện add sản phẩm vào giỏ hàng
+    var products = {{{ json products }}};
+
+    var Price = document.querySelectorAll(".cartShopItemPrice");
+    for (var i = 0; i < Price.length; i++) {
+      var priceFormat = '$';
+      priceFormat += parseFloat(products[i].price).toFixed(2);
+      Price[i].textContent = priceFormat;
+    }
+    var addToCart = document.querySelectorAll(".ShopItemAddToCart");
+    for (var i = 0; i < addToCart.length; i++) {
+      addToCart[i].onclick = function (index) {
+        return function () {
+          addToCart[index].classList.add("NotActive");
+          addToCart[index].querySelector("p").style.display = 'none';
+          addToCart[index].querySelector("img").style.display = 'block';
+          addItemToCart(index);
+        };
+      }(i);
+    }
+    //hàm cộng để tăng số lượng và cập nhật dữ liệu số lượng
+    function Plus() {
+      var Plus = document.querySelectorAll(".plus");
+      for (var i = 0; i < Plus.length; i++) {
+        Plus[i].onclick = function (index) {
+          return function () {
+            var numberOfProduct = document.querySelectorAll(".number");
+            var id = document.querySelectorAll(".idProduct2")[index].textContent;
+            var numberPlus = parseInt(numberOfProduct[index].textContent) + 1;
+            numberOfProduct[index].textContent = numberPlus;
+            var data1 = { number: numberPlus };
+            axios.put(`{{local}}/api/v1/products/${id}`, data1)
+              .then(response => {
+                getSum();
+              })
+              .catch(error => {
+                console.error('Error: ', error);
+              });
+          };
+        }(i);
+      }
+    }
+    //hàm trừ để giảm số lượng và cập nhật dữ liệu, nếu số lượng ===0 thì gọi remove
+    function Minus() {
+      var Minus = document.querySelectorAll(".minus");
+      for (var i = 0; i < Minus.length; i++) {
+        Minus[i].onclick = function (index) {
+          return function () {
+            var numberOfProduct = document.querySelectorAll(".number");
+            var id = document.querySelectorAll(".idProduct2")[index].textContent;
+            if (numberOfProduct[index].textContent !== '1') {
+              var numberMinus = parseInt(numberOfProduct[index].textContent) - 1;
+              numberOfProduct[index].textContent = numberMinus;
+              var data1 = { number: numberMinus };
+              axios.put(`{{local}}/api/v1/products/${id}`, data1)
+                .then(response => {
+                  getSum();
+                })
+                .catch(error => {
+                  console.error('Error: ', error);
+                });
+            }
+            else {
+              removeProduct = document.querySelectorAll(".cartItemRemove");
+              removeProduct[index].onclick();
+            }
+          };
+        }(i);
+      }
+    }
+    //hàm xóa đối tượng và xóa trong database
+    function remove() {
+      removeProduct = document.querySelectorAll(".cartItemRemove");
+      for (var i = 0; i < removeProduct.length; i++) {
+        removeProduct[i].onclick = function (index) {
+          return function () {
+            var id = document.querySelectorAll(".idProduct2")[index].textContent;
+            axios.delete(`{{local}}/api/v1/products/${id}`)
+              .then(response => {
+                removeAndZoomOut(document.querySelectorAll(".idProduct2")[index].textContent);
+              })
+              .catch(error => {
+                console.error('Error: ', error);
+              });
+          };
+        }(i);
+      }
+    }
+    //hàm tạo hiệu ứng zoom out khi xóa 
+    function removeAndZoomOut(id) {
+
+      var cartItem = document.querySelectorAll('.cartItem');
+      var index;
+      for (var i = 0; i < cartItem.length; i++) {
+        var idItem = cartItem[i].querySelector(".idProduct2").textContent;
+        if (idItem == id) {
+          index = i;
+          break;
+        }
+      }
+      // Thêm class zoom-out để áp dụng hiệu ứng zoomOut
+      cartItem[index].classList.add('zoom-out');
+      // Đợi cho đến khi hiệu ứng kết thúc, sau đó xóa khối
+      cartItem[index].addEventListener('animationend', function () {
+        // Xóa cartItem khỏi thằng cha khi hiệu ứng kết thúc
+
+        cartItem[index].parentNode.removeChild(cartItem[index]);
+
+
+
+         var   ShopItem = document.querySelectorAll('.ShopItem');
+      var index2;
+      for (var i = 0; i < ShopItem.length; i++) {
+        var idItem = ShopItem[i].querySelector(".idProduct").textContent;
+        if (idItem == id) {
+          index2 = i;
+          break;
+        }
+      }
+        var addToCart2 = document.querySelectorAll(".ShopItemAddToCart");
+        try{
+        addToCart2[index2].classList.remove("NotActive");
+        addToCart2[index2].querySelector("p").style.display = 'block';
+        addToCart2[index2].querySelector("img").style.display = 'none';
+        }
+        catch(errr)
+        {
+
+        }
+       
+        remove();
+        Minus();
+        Plus();
+        getSum();
+      });
+
+    }
+
+    //hàm thêm sản phẩm vào giỏ hàng
+    function addItemToCart(index) {
+      document.querySelector(".emptyNotify").style.display = 'none';
+      var newItem = document.createElement('div');
+      newItem.style.display = 'none';
+      var idProduct = document.querySelectorAll(".idProduct");
+      var data = { id: idProduct[index].textContent, number: 1 };
+      axios.post("{{local}}/api/v1/products", data)
+        .then(response => {
+          axios.get(`{{local}}/api/v1/products/${response.data.id}`)
+            .then(response => {
+              var shoe = response.data.shoe;
+              newItem.innerHTML = `
+                  <div class="cartItem">
+                 <p style="display: none;" class="idProduct2">${shoe.id}</p>
+                                    <div class="cartItemLeft">
+                                        <div class="cartItemImage cartItemImage" style="background-color:${shoe.color}">
+                                            <div class="cartItemImageBack">
+                                                <img src="${shoe.image}" alt="">
+                                            </div>
+                                        </div>
+                                       
+                                    </div>
+                                    <div class="cartItemRight">
+                                        <div class="cartItemName">
+                                            ${shoe.name}
+                                        </div>
+                                        <div class="cartItemPrice">
+                                            ${shoe.price}
+                                        </div>
+                                        <div class="cartItemAnimate">
+                                            <div class="cartItemCount">
+                                                <div class="cartItemCountButton minus">-</div>
+                                                <div class="cartItemCountNumber number">1</div>
+                                                <div class="cartItemCountButton plus">+</div>
+                                            </div>
+                                            <div class="cartItemRemove">
+                                                <img src="/img/trash.png" alt="">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+  `;
+
+              // HTML nội dung của phần tử mới
+
+              // Lấy tham chiếu đến phần tử chứa các mục trong giỏ hàng
+              var cartItemsContainer = document.getElementById('cartItemsContainer');
+
+              // Thêm phần tử mới vào cuối danh sách
+              cartItemsContainer.appendChild(newItem);
+              var Price2 = document.querySelectorAll(".cartItemPrice");
+              var priceFormat = '$';
+              priceFormat += parseFloat(Price2[Price2.length - 1].textContent).toFixed(2);
+              Price2[Price2.length - 1].innerHTML = priceFormat;
+              // Hiển thị phần tử mới
+              newItem.style.display = 'block';
+              getSum();
+              Plus();
+              Minus();
+              remove();
+            })
+            .catch(error => {
+              console.error('Error: ', error);
+            });
+        })
+        .catch(error => {
+          console.error('Error: ', error);
+        });
+
+    }
+
+  </script>
+</body>
+
+</html>

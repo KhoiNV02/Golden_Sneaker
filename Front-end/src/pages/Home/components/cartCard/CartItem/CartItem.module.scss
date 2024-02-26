@@ -1,0 +1,159 @@
+.emptyNotify {
+  position: absolute;
+}
+
+.emptyNotifyDes {
+  font-size: 14px;
+}
+
+.cartItem {
+  display: flex;
+  padding: 20px 0;
+}
+.cartItem.zoom_out {
+  animation: zoomOut 0.5s ease-in-out;
+  animation-fill-mode: forwards;
+}
+@keyframes zoomOut {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(0);
+  }
+}
+.cartItemLeft {
+  flex: 0;
+  animation: zoomIn 0.5s ease-in-out;
+}
+
+.cartItemRight {
+  flex: 1;
+}
+
+@keyframes zoomIn {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+.cartItemName {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.5;
+  margin-bottom: 10px;
+  opacity: 0;
+  animation: slideInFromRight 0.5s ease-in-out;
+  animation-delay: 0.2s;
+  animation-fill-mode: forwards;
+}
+
+.cartItemPrice {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  opacity: 0;
+  animation: slideInFromRight 0.5s ease-in-out;
+  animation-delay: 0.3s;
+  animation-fill-mode: forwards;
+}
+.cartItemImage {
+  width: 90px;
+  height: 90px;
+  border-radius: 100%;
+  background-color: #eee;
+  margin-right: 34px;
+}
+.cartItemAnimate {
+  opacity: 0;
+  animation: slideInFromRight 0.5s ease-in-out;
+  animation-delay: 0.4s;
+  animation-fill-mode: forwards;
+}
+.cartItemAnimate,
+.cartItemCount {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.cartItemCount {
+  flex: 1;
+}
+
+.cartItemCountNumber {
+  font-size: 14px;
+  margin: 0 8px;
+  width: 20px;
+  text-align: center;
+}
+
+.cartItemCountButton {
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+  border-radius: 100%;
+  background-color: #eee;
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: 0.2s;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.cartItemCountButton:hover {
+  background-color: #ddd;
+}
+
+.cartItemRemove {
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  border-radius: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f6c90e;
+  transition: 0.2s;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.cartItemRemove:hover {
+  background-color: #f8d43f;
+  box-shadow: -2px 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.cartItemRemove img {
+  width: 16px;
+  height: 16px;
+}
+
+.cartItemImageBack img {
+  display: block;
+  width: 140%;
+  transform: rotate(-28deg) translateY(-40px);
+  filter: drop-shadow(0 30px 20px rgba(0, 0, 0, 0.2));
+}
